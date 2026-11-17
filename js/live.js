@@ -25,8 +25,9 @@
     const byId = new Map(res.entries.map((e) => [e.id, e])); const ids = []; const add = (id) => { const e = byId.get(id); if (e && !e.flag && !ids.includes(id) && ids.length < MAX_LINES) ids.push(id); };
     for (const h of (an && an.hypotheses) || []) { h.causeEvidence.forEach(add); h.symptomEvidence.forEach(add); }
     for (const a of (an && an.detect.anomalies) || []) (a.evidence || []).forEach(add);
+    const top = an && an.hypotheses[0]; if (top) for (const id of top.causeEvidence.slice(0, 3)) for (let d = -3; d <= 3; d++) add(id + d);
     const cl = res.clusters.slice().sort((a, b) => ({ fatal: 0, error: 1, warn: 2 }[a.level] ?? 3) - ({ fatal: 0, error: 1, warn: 2 }[b.level] ?? 3) || b.count - a.count);
-    for (const c of cl) for (const id of c.sample.slice(0, c.level === 'error' || c.level === 'fatal' ? 2 : 1)) add(id);
+    for (const c of cl) for (const id of c.sample.slice(0, c.level === 'error' || c.level === 'fatal' || c.level === 'warn' ? 4 : 2)) add(id);
     if (res.entries.length) { add(res.entries[0].id); add(res.entries[res.entries.length - 1].id); }
     return ids.map((id) => byId.get(id)).sort((a, b) => (a.ts || 0) - (b.ts || 0) || a.id - b.id);
   }
