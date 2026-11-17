@@ -101,7 +101,7 @@
     const past = similarPast(o.past || PT.PAST, top, res);
     return { detect: Object.assign({}, det, { anomalies }), hypotheses: hyps, top: abstain ? null : top, abstain, contributing, past, flaggedExcluded: all.length - entries.length, considered: entries.length, byId };
   }
-  function fixesFor(p, ctx) { return (p.fixes || []).map((f) => ({ id: f.id, title: K.fill(f.title, ctx).replace(/<(\w+)>/g, (m, k) => ({ prev: 'the previous release', service: 'the service', host: 'the host' }[k] || m)), why: f.why, steps: (f.steps || []).map((s) => K.fill(s, ctx)), commands: (f.commands || []).map((c) => { const cmd = K.fill(c.cmd, ctx); return { cmd, note: c.note || '', risk: K.classify(cmd) }; }), simulate: f.simulate ? K.fill(f.simulate, ctx) : null })); }
+  function fixesFor(p, ctx) { return (p.fixes || []).map((f) => ({ id: f.id, title: K.fill(f.title, ctx).replace(/<(\w+)>/g, (m, k) => ({ prev: 'the previous release', service: 'the service', host: 'the host' }[k] || m)), why: f.why ? K.fill(f.why, ctx) : '', steps: (f.steps || []).map((s) => K.fill(s, ctx)), commands: (f.commands || []).map((c) => { const cmd = K.fill(c.cmd, ctx); return { cmd, note: c.note ? K.fill(c.note, ctx) : '', risk: K.classify(cmd) }; }), simulate: f.simulate ? K.fill(f.simulate, ctx) : null })); }
   function collectNext(res, det, hyps, entries) {
     const out = []; const add = (x) => { if (x && !out.includes(x)) out.push(x); };
     const svc5 = majority(entries.filter((e) => e.http && e.http.status >= 500).map((e) => e.service));
