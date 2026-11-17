@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IncidentLens AI: an incident agent that reads logs and suggests fixes</title>
+  <meta name="description" content="Drop in logs, metrics and a change list. IncidentLens parses and clusters the logs, finds anomalies, ranks root-cause hypotheses that cite exact log lines, redacts secrets, flags prompt injection, and drafts fixes, status updates and a blameless postmortem. Runs in your browser; demo mode needs no key.">
+  <meta name="theme-color" content="#16202e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <script>try { var t = localStorage.getItem('il.theme'); if (t ? JSON.parse(t) === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark'); } catch (e) {}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <a class="brand" href="./"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="13.5" cy="13.5" r="9.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M20.5 20.5l7.5 7.5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M7.5 14h3l2-4.5 3 9 2-4.5h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>IncidentLens <b>AI</b></a>
+    <nav aria-label="App">
+      <button type="button" id="nav-help">How it works</button>
+      <button type="button" id="nav-export">Export</button>
+      <button type="button" id="nav-settings">Settings</button>
+      <button type="button" id="nav-theme" aria-label="Toggle dark theme" title="Toggle dark theme">◐</button>
+    </nav>
+  </header>
+  <main id="main">
+    <section class="hero">
+      <p class="eyebrow">THE INCIDENT AGENT</p>
+      <h1>Read the logs, find the <em>cause</em>, fix it safely.</h1>
+      <p class="lede">Paste or drop logs, metrics and recent changes. IncidentLens clusters the noise, lines errors up with deploys, and ranks root-cause hypotheses that cite the exact log lines behind them, or says plainly when the evidence isn’t enough. Secrets are redacted before anything is kept, instructions hidden in logs are ignored, and commands are copy-only. Nothing is run or sent.</p>
+      <div class="status-row"><span class="pill" id="mode-pill">Demo mode · no key</span><span class="pill">Fictional company: Brightcart</span><span class="pill ok">Commands copy-only · drafts never sent</span><span class="pill">Times in UTC</span></div>
+    </section>
+    <section class="panel ctx" aria-label="Incident">
+      <div class="ctx-row">
+        <div class="field"><label for="inc-select">Incident</label><select id="inc-select"></select></div>
+        <div class="ctx-meta" id="inc-meta"></div>
+        <div class="ctx-actions"><button type="button" id="new-inc" class="primary">+ New incident from logs</button></div>
+      </div>
+      <div id="inc-summary" class="inc-summary"></div>
+    </section>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Sections">
+      <button type="button" role="tab" data-tab="analysis">Analysis</button>
+      <button type="button" role="tab" data-tab="logs">Logs</button>
+      <button type="button" role="tab" data-tab="clusters">Clusters</button>
+      <button type="button" role="tab" data-tab="fixes">Fixes &amp; runbooks</button>
+      <button type="button" role="tab" data-tab="workspace">Workspace</button>
+      <button type="button" role="tab" data-tab="library">Library</button>
+    </nav>
+    <section id="panel" class="tabpanel" role="tabpanel" aria-live="polite"></section>
+    <footer class="foot small muted">IncidentLens AI is open source (MIT). It suggests; people decide. Brightcart, its services, people and logs are fictional, on <code>.example</code> addresses. Commands are shown as text to copy and are never run; runbook actions are simulations; status updates and postmortems are drafts that are never sent. Logs stay in this browser; in live mode only redacted, unflagged lines go to the AI provider you choose, with your own key.</footer>
+  </main>
+  <div id="modal-host"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/text.js"></script>
+  <script src="js/guard.js"></script>
+  <script src="js/redact.js"></script>
+  <script src="js/parse.js"></script>
+  <script src="js/cluster.js"></script>
+  <script src="js/pipeline.js"></script>
+  <script src="js/detect.js"></script>
+  <script src="js/commands.js"></script>
+  <script src="js/patterns.js"></script>
+  <script src="js/analyze.js"></script>
+  <script src="js/live.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="js/seed.js"></script>
+  <script src="js/llm.js"></script>
+  <script src="js/webllm.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+</body>
+</html>
