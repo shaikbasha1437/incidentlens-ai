@@ -11,8 +11,8 @@
   function createPipeline(opts) {
     const o = Object.assign({ ip: false, maxKeep: MAX_KEEP }, opts || {});
     const entries = []; const drain = C.createDrain(); const minutes = new Map(); const hits = []; const hitCount = {}; const flagged = [];
-    const stats = { lines: 0, entries: 0, kept: 0, dropped: 0, formats: {}, sources: [], services: {}, levels: {}, first: null, last: null, noTs: 0 };
-    let id = 0; let infoKept = 0; let stride = 1; let infoSeen = 0;
+    const stats = { lines: 0, entries: 0, kept: 0, dropped: 0, droppedImportant: 0, formats: {}, sources: [], services: {}, levels: {}, first: null, last: null, noTs: 0 };
+    let id = 0; let infoKept = 0; let impKept = 0; let stride = 1; let infoSeen = 0;
     function take(e, src) {
       id++; e.id = id; stats.entries++;
       if (e.ts == null && src.lastTs != null) { e.ts = src.lastTs; e.tsInherited = true; } else if (e.ts != null) src.lastTs = e.ts; else stats.noTs++;
@@ -29,10 +29,13 @@
         b.n++; if (e.level === 'warn') b.warn++; if (e.level === 'error' || e.level === 'fatal') b.error++;
         if (e.http) { b.req++; if (e.http.status >= 500) b.s5xx++; else if (e.http.status >= 400) b.s4xx++; if (e.http.ms != null && isFinite(e.http.ms)) { b.latSum += e.http.ms; b.latN++; if (b.lats.length < 200) b.lats.push(e.http.ms); } }
       }
+      /* Warnings, errors, flagged lines, Kubernetes events and stack traces have their own budget (maxKeep), so a
+         flood of info lines early in a file can never push out the errors that come later. Info lines get 40% of
+         maxKeep: all of the first quarter, then a thinning sample. */
       const important = P.RANK[e.level] >= 3 || e.flag || e.k8s || e.trace;
       let keep = true;
-      if (entries.length >= o.maxKeep) keep = false;
-      else if (!important) { infoSeen++; if (infoKept >= o.maxKeep * 0.5) { if (infoSeen % stride !== 0) keep = false; } if (keep) { infoKept++; if (infoKept >= o.maxKeep * 0.5 && infoKept % Math.max(1, Math.floor(o.maxKeep * 0.1)) === 0) stride *= 2; } }
+      if (important) { if (impKept >= o.maxKeep) { keep = false; stats.droppedImportant++; } else impKept++; }
+      else { infoSeen++; if (infoKept >= o.maxKeep * 0.4) keep = false; else if (infoKept >= o.maxKeep * 0.25 && infoSeen % stride !== 0) keep = false; if (keep) { infoKept++; if (infoKept >= o.maxKeep * 0.25 && infoKept % Math.max(1, Math.floor(o.maxKeep * 0.05)) === 0) stride *= 2; } }
       if (keep) { entries.push(e); stats.kept++; } else stats.dropped++;
     }
     function addSource(name, sopts) {

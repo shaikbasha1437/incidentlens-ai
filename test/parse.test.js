@@ -45,3 +45,8 @@ test('pipeline: huge info volume is sampled but every warning and error is kept'
   const res = PL.run([{ name: 'a.log', text: lines.join('\n') }], { year: 2026, maxKeep: 1000 });
   assert.ok(res.entries.length <= 1100); assert.strictEqual(res.entries.filter((e) => e.level === 'error').length, 30); assert.ok(res.stats.dropped > 0);
 });
+test('pipeline: errors that arrive after a long info flood are still kept', () => {
+  const lines = []; for (let i = 0; i < 20000; i++) lines.push('2026-11-12T14:00:00Z INFO [api] ok ' + i); for (let i = 0; i < 50; i++) lines.push('2026-11-12T14:30:00Z ERROR [api] java.lang.OutOfMemoryError: Java heap space');
+  const res = PL.run([{ name: 'a.log', text: lines.join('\n') }], { year: 2026, maxKeep: 1000 });
+  assert.strictEqual(res.entries.filter((e) => e.level === 'error').length, 50); assert.ok(res.entries.length <= 450); assert.strictEqual(res.stats.droppedImportant, 0);
+});
