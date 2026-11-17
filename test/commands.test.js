@@ -1,0 +1,9 @@
+const test = require('node:test'); const assert = require('node:assert');
+const K = require('../js/commands.js');
+test('read-only diagnostics are read-only', () => { for (const c of ['kubectl -n shop get pods', 'kubectl logs deploy/checkout-api --since=30m', 'kubectl -n shop rollout history deployment/checkout-api', 'dig +short api.payments.example', 'openssl s_client -connect pay.example:443 </dev/null | openssl x509 -noout -dates', 'df -h', 'SELECT count(*) FROM pg_stat_activity;']) assert.strictEqual(K.classify(c).level, 'read', c); });
+test('changes are labelled as changes', () => { for (const c of ['kubectl -n shop rollout undo deployment/checkout-api', 'kubectl set env deploy/orders-svc POOL=40', 'helm rollback orders 41', 'kubectl -n shop scale deploy/recs-svc --replicas=4']) assert.notStrictEqual(K.classify(c).level, 'read', c); });
+test('destructive commands are risky and explain their blast radius', () => {
+  for (const c of ['kubectl delete namespace shop', 'DROP TABLE orders;', 'DELETE FROM orders;', 'rm -rf /var/lib/postgresql', 'kubectl -n shop scale deploy/checkout-api --replicas=0', 'curl -k https://pay.example', 'kubectl delete pod --all -n shop']) { const r = K.classify(c); assert.strictEqual(r.level, 'risky', c); assert.ok(r.reasons.length >= 1, c); }
+});
+test('fill replaces known placeholders and leaves unknowns visible', () => { assert.strictEqual(K.fill('kubectl -n {ns} rollout undo deploy/{service} # {flag}', { ns: 'shop', service: 'api' }), 'kubectl -n shop rollout undo deploy/api # <flag>'); });
+test('a scoped DELETE ... WHERE is a change, an unscoped DELETE is risky', () => { assert.strictEqual(K.classify('DELETE FROM sessions WHERE expires_at < now()').level, 'change'); assert.strictEqual(K.classify('delete from sessions').level, 'risky'); });
