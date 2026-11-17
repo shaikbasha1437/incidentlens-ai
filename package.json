@@ -1,0 +1,8 @@
+{
+  "name": "incidentlens-ai",
+  "version": "1.0.0",
+  "description": "An incident agent that reads logs and suggests fixes, with cited evidence, redaction and copy-only commands. Runs in the browser.",
+  "private": true,
+  "license": "MIT",
+  "scripts": { "test": "node --test test/*.test.js" }
+}

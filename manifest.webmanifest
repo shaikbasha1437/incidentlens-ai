@@ -1,0 +1,15 @@
+{
+  "name": "IncidentLens AI",
+  "short_name": "IncidentLens",
+  "description": "An incident agent that reads logs, ranks root-cause hypotheses with cited log lines, and suggests safe, copy-only fixes.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6f8",
+  "theme_color": "#16202e",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
