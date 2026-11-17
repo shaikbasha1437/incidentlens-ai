@@ -34,7 +34,7 @@ Checked on 2026-11-17 against the live site, https://shaikbasha1437.github.io/in
   - Backups contain no keys and round-trip.
   - Pattern validation.
 - **Static checks:** every script parses, the service worker caches every module, and the manifest icons exist.
-- **Hygiene:** no numbering labels or visa wording, no real-looking keys, and only `.example` addresses.
+- **Hygiene:** no numbering labels or forbidden wording, no real-looking keys, and only `.example` addresses.
 
 ## Demo ground truth
 
@@ -60,7 +60,7 @@ Firefox runs two fewer checks because Playwright can't read the clipboard there:
 
 What the checks cover:
 
-- **Load:** the eyebrow, six demo incidents, demo mode, the service worker, and no numbering or visa wording.
+- **Load:** the eyebrow, six demo incidents, demo mode, the service worker, and no numbering or forbidden wording.
 - **Ground truth in the UI:** all six verdicts. The abstention lists data to collect.
 - **Citations:** clicking a cause line opens Logs with the line highlighted and in view.
 - **Safety:**
